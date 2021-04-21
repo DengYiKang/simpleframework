@@ -7,10 +7,12 @@ import com.yikang.entity.dto.Result;
 import com.yikang.service.combine.HeadLineShopCategoryCombineService;
 import com.yikang.service.solo.HeadLineService;
 import com.yikang.service.solo.ShopCategoryService;
+import org.simpleframework.core.annotation.Service;
 
 import java.util.List;
 
 
+@Service
 public class HeadLineShopCategoryCombineServiceImpl implements HeadLineShopCategoryCombineService {
 
     private HeadLineService headLineService;

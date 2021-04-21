@@ -3,9 +3,11 @@ package com.yikang.service.solo.impl;
 import com.yikang.entity.bo.ShopCategory;
 import com.yikang.entity.dto.Result;
 import com.yikang.service.solo.ShopCategoryService;
+import org.simpleframework.core.annotation.Service;
 
 import java.util.List;
 
+@Service
 public class ShopCategoryServiceImpl implements ShopCategoryService {
     @Override
     public Result<Boolean> addShopCategory(ShopCategory shopCategory) {

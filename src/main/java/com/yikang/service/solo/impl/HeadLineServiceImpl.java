@@ -4,11 +4,13 @@ import com.yikang.entity.bo.HeadLine;
 import com.yikang.entity.dto.Result;
 import com.yikang.service.solo.HeadLineService;
 import lombok.extern.slf4j.Slf4j;
+import org.simpleframework.core.annotation.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Service
 public class HeadLineServiceImpl implements HeadLineService {
     @Override
     public Result<Boolean> addHeadLine(HeadLine headLine) {

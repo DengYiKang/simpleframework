@@ -3,12 +3,14 @@ package com.yikang.controller.superadmin;
 import com.yikang.entity.bo.ShopCategory;
 import com.yikang.entity.dto.Result;
 import com.yikang.service.solo.ShopCategoryService;
+import org.simpleframework.core.annotation.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
+@Controller
 public class ShopCategoryOperationController {
 
     private ShopCategoryService shopCategoryService;
