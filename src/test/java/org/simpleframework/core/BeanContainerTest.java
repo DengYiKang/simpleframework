@@ -1,11 +1,10 @@
-package org.simpleframework.ciore;
+package org.simpleframework.core;
 
 import com.yikang.controller.DispatcherServlet;
 import com.yikang.controller.frontend.MainPageController;
 import com.yikang.service.solo.HeadLineService;
 import com.yikang.service.solo.impl.HeadLineServiceImpl;
 import org.junit.jupiter.api.*;
-import org.simpleframework.BeanContainer;
 import org.simpleframework.core.annotation.Controller;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

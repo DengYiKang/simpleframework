@@ -1,4 +1,4 @@
-package org.simpleframework;
+package org.simpleframework.core;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

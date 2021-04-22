@@ -4,6 +4,7 @@ import com.yikang.entity.bo.HeadLine;
 import com.yikang.entity.dto.Result;
 import com.yikang.service.solo.HeadLineService;
 import org.simpleframework.core.annotation.Controller;
+import org.simpleframework.inject.annotation.Autowired;
 
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import java.util.List;
 @Controller
 public class HeadLineOperationController {
 
+    @Autowired
     private HeadLineService headLineService;
 
     public Result<Boolean> addHeadLine(HttpServletRequest request, HttpServletResponse response) {
