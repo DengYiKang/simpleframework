@@ -29,6 +29,7 @@ public class ProxyDemo {
         MethodInterceptor methodInterceptor = new AlipayMethodInterceptor();
         CommonPayment commonPaymentProxy = CglibUtil.createProxy(commonPayment, methodInterceptor);
         commonPaymentProxy.pay();
+        commonPaymentProxy.pay2();
         ToCPayment toCPayment = new ToCPaymentImpl();
         ToCPayment toCProxy = CglibUtil.createProxy(toCPayment, methodInterceptor);
         toCProxy.pay();

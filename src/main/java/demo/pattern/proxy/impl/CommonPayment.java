@@ -4,4 +4,8 @@ public class CommonPayment {
     public void pay() {
         System.out.println("个人名义或者公司名义都可以走这个支付通道");
     }
+
+    public void pay2() {
+        System.out.println("这是新的方法");
+    }
 }
