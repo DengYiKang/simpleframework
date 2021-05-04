@@ -7,7 +7,6 @@ import org.simpleframework.aop.aspect.DefaultAspect;
 import org.simpleframework.core.BeanContainer;
 import org.simpleframework.util.ValidationUtil;
 
-import java.lang.annotation.Annotation;
 import java.util.*;
 
 public class AspectWeaver {
@@ -20,59 +19,60 @@ public class AspectWeaver {
     public void doAop() {
         //1、获取所有的切面类
         Set<Class<?>> aspectSet = beanContainer.getClassesByAnnotation(Aspect.class);
-        //2、将切面类按照不同的织入目标进行切分
-        //实现的是简化版的，只能对注解标注的对象织入切面
-        Map<Class<? extends Annotation>, List<AspectInfo>> categorizedMap = new HashMap<>();
         if (ValidationUtil.isEmpty(aspectSet)) return;
-        for (Class<?> aspectClass : aspectSet) {
-            if (verifyAspect(aspectClass)) {
-                categorizedAspect(categorizedMap, aspectClass);
-            } else {
-                throw new RuntimeException("@Aspect and @Order have not been added to the Aspect class," +
-                        "or Aspect class does not extend from DefaultAspect, or the value in Aspect Tag equals @Aspect");
+        //2、拼装AspectInfoList
+        List<AspectInfo> aspectInfoList = packAspectInfoList(aspectSet);
+        //3、遍历容器里的类
+        Set<Class<?>> classSet = beanContainer.getClasses();
+        for (Class<?> targetClass : classSet) {
+            //排除AspectClass自身
+            if (targetClass.isAnnotationPresent(Aspect.class)) {
+                continue;
+            }
+            //4、粗筛符合条件的Aspect
+            List<AspectInfo> roughMatchedAspectList = collectRoughMatchedAspectListForSpecificClass(aspectInfoList, targetClass);
+            //5、尝试进行Aspect的织入
+            wrapIfNecessary(roughMatchedAspectList, targetClass);
+        }
+
+    }
+
+    private void wrapIfNecessary(List<AspectInfo> roughMatchedAspectList, Class<?> targetClass) {
+        if (ValidationUtil.isEmpty(roughMatchedAspectList)) return;
+        //创建动态代理对象
+        AspectListExecutor aspectListExecutor = new AspectListExecutor(targetClass, roughMatchedAspectList);
+        Object proxyBean = ProxyCreator.createProxy(targetClass, aspectListExecutor);
+        beanContainer.addBean(targetClass, proxyBean);
+    }
+
+    private List<AspectInfo> collectRoughMatchedAspectListForSpecificClass(List<AspectInfo> aspectInfoList, Class<?> targetClass) {
+        List<AspectInfo> roughMatchedAspectList = new ArrayList<>();
+        for (AspectInfo aspectInfo : aspectInfoList) {
+            //初筛
+            if (aspectInfo.getPointcutLocator().roughMatches(targetClass)) {
+                roughMatchedAspectList.add(aspectInfo);
             }
         }
-        //3、按照不同的织入目标分别去按序织入aspect的逻辑
-        if (ValidationUtil.isEmpty(categorizedMap)) return;
-        for (Class<? extends Annotation> category : categorizedMap.keySet()) {
-            weaveByCategory(category, categorizedMap.get(category));
-        }
+        return roughMatchedAspectList;
     }
 
-    private void weaveByCategory(Class<? extends Annotation> category, List<AspectInfo> aspectInfoList) {
-        //1、获取被代理类的集合
-        Set<Class<?>> classSet = beanContainer.getClassesByAnnotation(category);
-        if (ValidationUtil.isEmpty(classSet)) return;
-        //2、遍历被代理类，分别为每个被代理类生成动态代理实例
-        for (Class<?> targetClass : classSet) {
-            //创建动态代理对象
-            AspectListExecutor executor = new AspectListExecutor(targetClass, aspectInfoList);
-            Object proxyBean = ProxyCreator.createProxy(targetClass, executor);
-            //3、将动态代理对象实例添加到容器里，取代未被代理前的类实例
-            beanContainer.addBean(targetClass, proxyBean);
+    private List<AspectInfo> packAspectInfoList(Set<Class<?>> aspectSet) {
+        List<AspectInfo> aspectInfoList = new ArrayList<>();
+        for (Class<?> aspectClass : aspectSet) {
+            if (verifyAspect(aspectClass)) {
+                Order orderTag = aspectClass.getAnnotation(Order.class);
+                Aspect aspectTag = aspectClass.getAnnotation(Aspect.class);
+                DefaultAspect defaultAspect = (DefaultAspect) beanContainer.getBean(aspectClass);
+                //初始化表达式定位器
+                PointcutLocator pointcutLocator = new PointcutLocator(aspectTag.pointcut());
+                AspectInfo aspectInfo = new AspectInfo(orderTag.value(), defaultAspect, pointcutLocator);
+                aspectInfoList.add(aspectInfo);
+            } else {
+                throw new RuntimeException("@Aspect and @Order must be added to the Aspect class," +
+                        " and Aspect class must extend from DefaultAspect");
+            }
         }
-    }
-
-    /**
-     * 将切面类按照不同的织入目标进行切分
-     *
-     * @param categorizedMap 分类map
-     * @param aspectClass    aspect对象
-     */
-    private void categorizedAspect(Map<Class<? extends Annotation>, List<AspectInfo>> categorizedMap, Class<?> aspectClass) {
-        Order orderTag = aspectClass.getAnnotation(Order.class);
-        Aspect aspectTag = aspectClass.getAnnotation(Aspect.class);
-        DefaultAspect aspect = (DefaultAspect) beanContainer.getBean(aspectClass);
-        AspectInfo aspectInfo = new AspectInfo(orderTag.value(), aspect);
-        if (!categorizedMap.containsKey(aspectTag.value())) {
-            //如果织入的join point第一次出现，则以该join point为key，以新创建的List<AspectInfo>为value
-            List<AspectInfo> aspectInfoList = new ArrayList<>();
-            aspectInfoList.add(aspectInfo);
-            categorizedMap.put(aspectTag.value(), aspectInfoList);
-        } else {
-            //如果织入的join point不是第一次出现，则往join point对应的value里添加新的aspectInfo
-            categorizedMap.get(aspectTag.value()).add(aspectInfo);
-        }
+        return aspectInfoList;
     }
 
     /**
@@ -85,7 +85,6 @@ public class AspectWeaver {
     private boolean verifyAspect(Class<?> aspectClass) {
         return aspectClass.isAnnotationPresent(Aspect.class)
                 && aspectClass.isAnnotationPresent(Order.class)
-                && DefaultAspect.class.isAssignableFrom(aspectClass)
-                && aspectClass.getAnnotation(Aspect.class).value() != Aspect.class;
+                && DefaultAspect.class.isAssignableFrom(aspectClass);
     }
 }

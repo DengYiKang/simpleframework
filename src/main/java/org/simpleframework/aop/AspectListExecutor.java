@@ -9,6 +9,7 @@ import org.simpleframework.util.ValidationUtil;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class AspectListExecutor implements MethodInterceptor {
@@ -38,7 +39,12 @@ public class AspectListExecutor implements MethodInterceptor {
     @Override
     public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         Object returnValue = null;
-        if (ValidationUtil.isEmpty(sortedAspectInfoList)) return returnValue;
+        collectAccurateMatchedAspectList(method);
+        if (ValidationUtil.isEmpty(sortedAspectInfoList)) {
+            //这里要注意，如果没有匹配的切面，那么还是需要调用原方法
+            returnValue = methodProxy.invokeSuper(o, args);
+            return returnValue;
+        }
         //1、按照order的顺序升级执行完所有Aspect的before方法
         invokeBeforeAdvices(method, args);
         try {
@@ -51,6 +57,17 @@ public class AspectListExecutor implements MethodInterceptor {
             invokeAfterThrowingAdvices(method, args, e);
         }
         return returnValue;
+    }
+
+    private void collectAccurateMatchedAspectList(Method method) {
+        if (ValidationUtil.isEmpty(sortedAspectInfoList)) return;
+        Iterator<AspectInfo> it = sortedAspectInfoList.iterator();
+        while (it.hasNext()) {
+            AspectInfo aspectInfo = it.next();
+            if (!aspectInfo.getPointcutLocator().accurateMatches(method)) {
+                it.remove();
+            }
+        }
     }
 
     //4、如果被代理方法抛出异常，则按照order的顺序降序执行完所有Aspect的afterThrowing方法

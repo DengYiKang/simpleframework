@@ -4,21 +4,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.aop.annotation.Aspect;
 import org.simpleframework.aop.annotation.Order;
 import org.simpleframework.aop.aspect.DefaultAspect;
-import org.simpleframework.core.annotation.Controller;
+import org.simpleframework.core.annotation.Service;
 
 import java.lang.reflect.Method;
 
 @Slf4j
-//@Aspect(pointcut = "execution(* com.yikang.controller.superadmin.HeadLineOperationController.*(..))")
 @Aspect(pointcut = "within(org.simpleframework.core.annotation.Component)")
 @Order(0)
-public class ControllerTimeCalculatorAspect extends DefaultAspect {
+
+public class ServiceTimeCalculatorAspect extends DefaultAspect {
     private long timestampCache;
     @Override
     public void before(Class<?> targetClass, Method method, Object[] args) throws Throwable {
         log.info("开始计时，执行的类是[{}],执行的方法是[{}]，参数是[{}]",
-                targetClass.getName(),method.getName(),args
-        );
+                targetClass.getName(),method.getName(),args);
         timestampCache = System.currentTimeMillis();
     }
 
@@ -30,4 +29,5 @@ public class ControllerTimeCalculatorAspect extends DefaultAspect {
                 targetClass.getName(),method.getName(),args, returnValue, costTime);
         return returnValue;
     }
+
 }
