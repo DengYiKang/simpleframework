@@ -1,6 +1,6 @@
 package org.simpleframework.core;
 
-import com.yikang.controller.DispatcherServlet;
+import org.simpleframework.mvc.DispatcherServlet;
 import com.yikang.controller.frontend.MainPageController;
 import com.yikang.service.solo.HeadLineService;
 import com.yikang.service.solo.impl.HeadLineServiceImpl;
