@@ -42,8 +42,8 @@ public class DispatcherServlet extends HttpServlet {
         //中间两个processor的顺序可以对调，
         //但必须保证PreRequestProcessor是第一个，ControllerRequestProcessor是最后一个
         PROCESSOR.add(new PreRequestProcessor());
-        PROCESSOR.add(new StaticResourceRequestProcessor());
-        PROCESSOR.add(new JspRequestProcessor());
+        PROCESSOR.add(new StaticResourceRequestProcessor(getServletContext()));
+        PROCESSOR.add(new JspRequestProcessor(getServletContext()));
         PROCESSOR.add(new ControllerRequestProcessor());
     }
 

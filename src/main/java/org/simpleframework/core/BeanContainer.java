@@ -8,6 +8,7 @@ import org.simpleframework.core.annotation.Component;
 import org.simpleframework.core.annotation.Controller;
 import org.simpleframework.core.annotation.Repository;
 import org.simpleframework.core.annotation.Service;
+import org.simpleframework.mvc.annotation.RequestMapping;
 import org.simpleframework.util.ClassUtil;
 import org.simpleframework.util.ValidationUtil;
 
@@ -28,7 +29,7 @@ public class BeanContainer {
      * 加载bean的注解列表
      */
     private static final List<Class<? extends Annotation>> BEAN_ANNOTATION =
-            Arrays.asList(Component.class, Controller.class, Service.class, Repository.class, Aspect.class);
+            Arrays.asList(Component.class, Controller.class, Service.class, Repository.class, Aspect.class, RequestMapping.class);
 
     /**
      * 获取bean容器实例
