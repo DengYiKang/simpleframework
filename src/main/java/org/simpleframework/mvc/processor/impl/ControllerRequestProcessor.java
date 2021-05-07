@@ -43,6 +43,11 @@ public class ControllerRequestProcessor implements RequestProcessor {
         initPathControllerMethodMap(requestMappingSet);
     }
 
+    /**
+     * 初始化映射map
+     *
+     * @param requestMappingSet 所有被@RequestMapping标记的类
+     */
     private void initPathControllerMethodMap(Set<Class<?>> requestMappingSet) {
         if (ValidationUtil.isEmpty(requestMappingSet)) return;
         //1、遍历所有被@RequestMapping标记的类，获取类上面该注解的属性值作为一级路径
@@ -131,7 +136,16 @@ public class ControllerRequestProcessor implements RequestProcessor {
         requestProcessorChain.setResultRender(resultRender);
     }
 
+    /**
+     * 转发请求（通过反射invoke对应的method）
+     *
+     * @param controllerMethod controller method
+     * @param request          请求
+     * @return 结果
+     */
     private Object invokeControllerMethod(ControllerMethod controllerMethod, HttpServletRequest request) {
+        //TODO:这存在一个问题，ControllerMethod中的Map是无序的，那么调用method的invoke时传入的参数顺序可能会出错，可以考虑在ControllerMethod中
+        // 加入一个有序的List或者使用LinkedHashMap、TreeMap等数据结构。
         //1、从请求里获取GET或者POST的参数名及其对应的值
         Map<String, String> requestParamMap = new HashMap<>();
         //GET, POST方法的请求参数获取方式
