@@ -5,6 +5,11 @@ import com.yikang.entity.dto.Result;
 import com.yikang.service.solo.HeadLineService;
 import org.simpleframework.core.annotation.Controller;
 import org.simpleframework.inject.annotation.Autowired;
+import org.simpleframework.mvc.annotation.RequestMapping;
+import org.simpleframework.mvc.annotation.RequestParam;
+import org.simpleframework.mvc.annotation.ResponseBody;
+import org.simpleframework.mvc.type.ModelAndView;
+import org.simpleframework.mvc.type.RequestMethod;
 
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,19 +18,33 @@ import java.util.List;
 
 
 @Controller
+@RequestMapping(value = "/headline")
 public class HeadLineOperationController {
 
     @Autowired
     private HeadLineService headLineService;
 
-    public Result<Boolean> addHeadLine(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public ModelAndView addHeadLine(@RequestParam("lineName") String lineName,
+                                    @RequestParam("lineLink") String lineLink,
+                                    @RequestParam("lineImg") String lineImg,
+                                    @RequestParam("priority") Integer priority) {
         //TODO:参数校验以及请求参数转化
-        return headLineService.addHeadLine(new HeadLine());
+        HeadLine headLine = new HeadLine();
+        headLine.setLineName(lineName);
+        headLine.setLineLink(lineLink);
+        headLine.setLineImg(lineImg);
+        headLine.setPriority(priority);
+        Result<Boolean> result = headLineService.addHeadLine(headLine);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setView("addheadline.jsp").addViewData("result", result);
+        return modelAndView;
     }
 
-    public Result<Boolean> removeHeadLine(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/remove", method = RequestMethod.GET)
+    public void removeHeadLine() {
         //TODO:参数校验以及请求参数转化
-        return headLineService.removeHeadLine(1);
+        System.out.println("delete headline");
     }
 
     public Result<Boolean> modifyHeadLine(HttpServletRequest request, HttpServletResponse response) {
@@ -33,12 +52,15 @@ public class HeadLineOperationController {
         return headLineService.modifyHeadLine(new HeadLine());
     }
 
+
     public Result<HeadLine> queryHeadLineById(HttpServletRequest request, HttpServletResponse response) {
         //TODO:参数校验以及请求参数转化
         return headLineService.queryHeadLineById(1);
     }
 
-    public Result<List<HeadLine>> queryHeadLineList(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/query", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<List<HeadLine>> queryHeadLineList() {
         //TODO:参数校验以及请求参数转化
         return headLineService.queryHeadLineList(new HeadLine(), 1, 100);
     }

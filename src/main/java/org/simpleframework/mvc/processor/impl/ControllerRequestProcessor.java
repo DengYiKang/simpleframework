@@ -71,16 +71,17 @@ public class ControllerRequestProcessor implements RequestProcessor {
                     //3、解析方法里被@RequestParam标记的参数
                     //获取该注解的属性值，作为参数名
                     //获取被标记的参数的数据类型，建立参数名和参数类型的映射
-                    Map<String, Class<?>> methodParams = new HashMap<>();
+                    Map<String, Class<?>> methodParams = new LinkedHashMap<>();
                     Parameter[] parameters = method.getParameters();
-                    if (ValidationUtil.isEmpty(parameters)) continue;
-                    for (Parameter parameter : parameters) {
-                        RequestParam param = parameter.getAnnotation(RequestParam.class);
-                        //目前暂定为Controller方法里面所有的参数都需要@RequestParam注解
-                        if (param == null) {
-                            throw new RuntimeException("The parameter must have @RequestParam");
+                    if (!ValidationUtil.isEmpty(parameters)) {
+                        for (Parameter parameter : parameters) {
+                            RequestParam param = parameter.getAnnotation(RequestParam.class);
+                            //目前暂定为Controller方法里面所有的参数都需要@RequestParam注解
+                            if (param == null) {
+                                throw new RuntimeException("The parameter must have @RequestParam");
+                            }
+                            methodParams.put(param.value(), parameter.getType());
                         }
-                        methodParams.put(param.value(), parameter.getType());
                     }
                     //4、将获取到的信息封装成RequestPathInfo实例和ControllerMethod实现，放置到映射表里
                     String httpMethod = String.valueOf(methodRequest.method());

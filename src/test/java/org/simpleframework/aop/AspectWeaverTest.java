@@ -15,6 +15,6 @@ public class AspectWeaverTest {
         new AspectWeaver().doAop();
         new DependencyInjector().doIoc();
         HeadLineOperationController headLineOperationController = (HeadLineOperationController) beanContainer.getBean(HeadLineOperationController.class);
-        headLineOperationController.addHeadLine(null, null);
+        headLineOperationController.addHeadLine("lineName1", "lineLink1", "lineImg1", 1);
     }
 }

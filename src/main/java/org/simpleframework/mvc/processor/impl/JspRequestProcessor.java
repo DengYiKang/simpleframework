@@ -31,6 +31,7 @@ public class JspRequestProcessor implements RequestProcessor {
     @Override
     public boolean process(RequestProcessorChain requestProcessorChain) throws Exception {
         if (isJspResource(requestProcessorChain.getRequestPath())) {
+
             jspServlet.forward(requestProcessorChain.getRequest(), requestProcessorChain.getResponse());
             return false;
         }
