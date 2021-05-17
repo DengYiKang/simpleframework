@@ -40,8 +40,9 @@ public class AspectWeaver {
     private void wrapIfNecessary(List<AspectInfo> roughMatchedAspectList, Class<?> targetClass) {
         if (ValidationUtil.isEmpty(roughMatchedAspectList)) return;
         //创建动态代理对象
-        AspectListExecutor aspectListExecutor = new AspectListExecutor(targetClass, roughMatchedAspectList);
-        Object proxyBean = ProxyCreator.createProxy(targetClass, aspectListExecutor);
+//        AspectListExecutor aspectListExecutor = new AspectListExecutor(targetClass, roughMatchedAspectList);
+        AspectInterceptor aspectInterceptor = new AspectInterceptor(targetClass, roughMatchedAspectList);
+        Object proxyBean = ProxyCreator.createProxy(targetClass, aspectInterceptor);
         beanContainer.addBean(targetClass, proxyBean);
     }
 

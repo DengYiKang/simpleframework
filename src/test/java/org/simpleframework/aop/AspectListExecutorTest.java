@@ -18,8 +18,8 @@ public class AspectListExecutorTest {
         aspectInfoList.add(new AspectInfo(2, new Mock3(), null));
         aspectInfoList.add(new AspectInfo(4, new Mock4(), null));
         aspectInfoList.add(new AspectInfo(1, new Mock5(), null));
-        AspectListExecutor aspectListExecutor = new AspectListExecutor(AspectListExecutorTest.class, aspectInfoList);
-        List<AspectInfo> sortedAspectInfoList = aspectListExecutor.getSortedAspectInfoList();
+        AspectInterceptor aspectInterceptor = new AspectInterceptor(AspectListExecutorTest.class, aspectInfoList);
+        List<AspectInfo> sortedAspectInfoList = aspectInterceptor.getSortedAspectInfoList();
         for (AspectInfo aspectInfo : sortedAspectInfoList) {
             System.out.println(aspectInfo.getAspectObject().getClass().getName());
         }
